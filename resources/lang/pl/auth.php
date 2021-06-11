@@ -13,9 +13,9 @@ return [
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
-    'password' => 'The provided password is incorrect.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-    'account_blocked' => 'Your account has been suspended. Please contact administrator.',
+    'failed'   => 'Błędny login lub hasło.',
+    'password' => 'Podane hasło jest nieprawidłowe.',
+    'throttle' => 'Za dużo nieudanych prób logowania. Proszę spróbować za :seconds sekund.',
+    'account_blocked' => 'Twoje konto zostało zablokowane. Skontaktuj się z administratorem.',
 
 ];
