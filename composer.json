@@ -6,11 +6,18 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "axlon/laravel-postal-code-validation": "^3.2",
+        "bensampo/laravel-enum": "^3.3",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "jeroennoten/laravel-adminlte": "^3.5",
         "laravel/framework": "^8.40",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+        "laravel/ui": "^3.2",
+        "pacerit/laravel-polish-validation-rules": "^4.0",
+        "propaganistas/laravel-phone": "^4.3",
+        "testmonitor/eloquent-incrementable": "3.0.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
