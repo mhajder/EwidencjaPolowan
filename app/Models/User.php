@@ -2,14 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Class User
+ * @package App\Models
+ */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use Notifiable, SoftDeletes;
+
+    /**
+     * @var string
+     */
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -17,9 +26,20 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
+        'username',
+        'first_name',
+        'last_name',
+        'pesel',
         'email',
+        'street',
+        'house_number',
+        'zip_code',
+        'city',
+        'phone',
         'password',
+        'permission',
+        'selected_district',
+        'disabled',
     ];
 
     /**
@@ -40,4 +60,25 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
+    /**
+     * Get a selected district from a given user.
+     *
+     * @return HasOne
+     */
+    public function selectedDistrict(): HasOne
+    {
+        return $this->hasOne(District::class, 'id', 'selected_district');
+    }
 }
