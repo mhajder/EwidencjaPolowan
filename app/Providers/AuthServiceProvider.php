@@ -25,6 +25,18 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        /**
+         * Permission levels:
+         * 1 is normal user
+         * 2-8 are unused
+         * 9 is admin
+         */
+        Gate::define('admin-only', function ($user) {
+            if ($user->permission >= 9) {
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 }
