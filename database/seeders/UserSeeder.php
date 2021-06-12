@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
@@ -27,7 +28,7 @@ class UserSeeder extends Seeder
                 'zip_code' => '12-345',
                 'city' => 'Warszawa',
                 'phone' => '123 123 123',
-                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+                'password' => Hash::make('password'), // password
                 'permission' => 9,
                 'selected_district' => 1,
                 'disabled' => false,
