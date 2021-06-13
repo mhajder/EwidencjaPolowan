@@ -81,4 +81,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(District::class, 'id', 'selected_district');
     }
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
 }
