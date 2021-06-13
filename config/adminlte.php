@@ -46,7 +46,8 @@ return [
     */
 
     'logo' => 'Ewidencja <b>Polowań</b>',
-    'logo_img' => '',
+    'logo_disabled' => true,
+    'logo_img' => null,
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,8 +87,9 @@ return [
     'layout_topnav' => null,
     'layout_boxed' => null,
     'layout_fixed_sidebar' => true,
-    'layout_fixed_navbar' => null,
-    'layout_fixed_footer' => true,
+    'layout_fixed_navbar' => true,
+    'layout_fixed_footer' => null,
+    'layout_dark_mode' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -144,7 +146,7 @@ return [
     |
     */
 
-    'sidebar_mini' => true,
+    'sidebar_mini' => 'lg',
     'sidebar_collapse' => false,
     'sidebar_collapse_auto_size' => false,
     'sidebar_collapse_remember' => false,
@@ -186,14 +188,14 @@ return [
     |
     */
 
-    'use_route_url' => false,
+    'use_route_url' => true,
     'dashboard_url' => 'home',
     'logout_url' => 'logout',
     'login_url' => 'login',
-    'register_url' => null,
-    'password_reset_url' => null,
-    'password_email_url' => null,
-    'profile_url' => '/profile',
+    'register_url' => false,
+    'password_reset_url' => false,
+    'password_email_url' => false,
+    'profile_url' => 'profile.index',
 
     /*
     |--------------------------------------------------------------------------
@@ -325,7 +327,7 @@ return [
     | Here we can modify the plugins used inside the admin panel.
     |
     | For detailed instructions you can look the plugins section here:
-    | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Other-Configuration
+    | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Plugins-Configuration
     |
     */
 
