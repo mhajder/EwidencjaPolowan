@@ -22,7 +22,7 @@ Auth::routes(['register' => false, 'reset' => false]);
 
 Route::get('/home', function () {
     return redirect()->route('hunting.index');
-});
+})->name('home');
 
 // ProfileController
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
