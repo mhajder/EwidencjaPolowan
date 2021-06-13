@@ -5,7 +5,7 @@
     {{-- Search form --}}
     @include('adminlte::partials.navbar.menu-item-search-form')
 
-@if ($navbarItemHelper->isNotification($item))
+@elseif ($navbarItemHelper->isNotification($item))
 
     {{-- Notification link (using blade component) --}}
     <x-adminlte-navbar-notification

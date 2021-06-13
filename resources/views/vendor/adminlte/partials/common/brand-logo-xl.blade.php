@@ -16,7 +16,6 @@
     @endif>
 
     {{-- Small brand logo --}}
-    @if(false)
     <img src="{{ asset(config('adminlte.logo_img', 'vendor/adminlte/dist/img/AdminLTELogo.png')) }}"
          alt="{{ config('adminlte.logo_img_alt', 'AdminLTE') }}"
          class="{{ config('adminlte.logo_img_class', 'brand-image-xl') }} logo-xs">
@@ -25,5 +24,5 @@
     <img src="{{ asset(config('adminlte.logo_img_xl')) }}"
          alt="{{ config('adminlte.logo_img_alt', 'AdminLTE') }}"
          class="{{ config('adminlte.logo_img_xl_class', 'brand-image-xs') }} logo-xl">
-    @endif
+
 </a>

@@ -19,11 +19,11 @@
         @if(config('adminlte.usermenu_image'))
             <img src="{{ Auth::user()->adminlte_image() }}"
                  class="user-image img-circle elevation-2"
-                 alt="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
+                 alt="{{ Auth::user()->name }}">
         @endif
         <span @if(config('adminlte.usermenu_image')) class="d-none d-md-inline" @endif>
             <i class="fa fa-fw fa-user"></i>
-            {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}
+            {{ Auth::user()->name }}
         </span>
     </a>
 
@@ -37,10 +37,10 @@
                 @if(config('adminlte.usermenu_image'))
                     <img src="{{ Auth::user()->adminlte_image() }}"
                          class="img-circle elevation-2"
-                         alt="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
+                         alt="{{ Auth::user()->name }}">
                 @endif
                 <p class="@if(!config('adminlte.usermenu_image')) mt-0 @endif">
-                    {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}
+                    {{ Auth::user()->name }}
                     @if(config('adminlte.usermenu_desc'))
                         <small>{{ Auth::user()->adminlte_desc() }}</small>
                     @endif

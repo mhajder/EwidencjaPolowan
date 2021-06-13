@@ -1,15 +1,19 @@
 <aside class="main-sidebar {{ config('adminlte.classes_sidebar', 'sidebar-dark-primary elevation-4') }}">
 
     {{-- Sidebar brand logo --}}
-    @if(config('adminlte.logo_img_xl'))
-        @include('adminlte::partials.common.brand-logo-xl')
+    @if(!config('adminlte.logo_disabled', false))
+        @if(config('adminlte.logo_img_xl'))
+            @include('adminlte::partials.common.brand-logo-xl')
+        @else
+            @include('adminlte::partials.common.brand-logo-xs')
+        @endif
     @else
-        @include('adminlte::partials.common.brand-logo-xs')
+        @include('adminlte::partials.common.brand-logo-disabled')
     @endif
 
     {{-- Sidebar menu --}}
     <div class="sidebar">
-        <nav class="mt-2">
+        <nav class="pt-2">
             <ul class="nav nav-pills nav-sidebar flex-column {{ config('adminlte.classes_sidebar_nav', '') }}"
                 data-widget="treeview" role="menu"
                 @if(config('adminlte.sidebar_nav_animation_speed') != 300)

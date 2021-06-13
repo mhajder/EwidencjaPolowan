@@ -5,10 +5,14 @@
     <div class="{{ config('adminlte.classes_topnav_container', 'container') }}">
 
         {{-- Navbar brand logo --}}
-        @if(config('adminlte.logo_img_xl'))
-            @include('adminlte::partials.common.brand-logo-xl')
+        @if(!config('adminlte.logo_disabled', false))
+            @if(config('adminlte.logo_img_xl'))
+                @include('adminlte::partials.common.brand-logo-xl')
+            @else
+                @include('adminlte::partials.common.brand-logo-xs')
+            @endif
         @else
-            @include('adminlte::partials.common.brand-logo-xs')
+            @include('adminlte::partials.common.brand-logo-disabled')
         @endif
 
         {{-- Navbar toggler button --}}
@@ -36,8 +40,6 @@
 
             {{-- Configured right links --}}
             @each('adminlte::partials.navbar.menu-item', $adminlte->menu('navbar-right'), 'item')
-
-            @include('adminlte::partials.navbar.menu-item-change-district')
 
             {{-- Change disctrict link --}}
             @include('adminlte::partials.navbar.menu-item-change-district')
