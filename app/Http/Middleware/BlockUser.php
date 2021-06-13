@@ -24,7 +24,9 @@ class BlockUser
         if (auth()->check() && auth()->user()->disabled == 1) {
             auth()->logout();
 
-            return redirect()->route('login')->with('blocked', __('auth.account_blocked'));
+            return redirect()->route('login')->withAlertsDanger([
+                ['title' => '', 'message' => __('auth.account_blocked')],
+            ]);
         }
 
         return $next($request);

@@ -21,13 +21,7 @@
 @section('auth_header', __('adminlte::adminlte.login_message'))
 
 @section('auth_body')
-    @if(session()->has('blocked'))
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-           {{ session()->get('blocked') }}
-        </div>
-    @endif
-
+    @include('alerts')
     <form action="{{ $login_url }}" method="post">
         {{ csrf_field() }}
 

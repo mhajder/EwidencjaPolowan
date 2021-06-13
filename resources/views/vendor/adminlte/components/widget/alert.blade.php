@@ -8,9 +8,9 @@
     @endisset
 
     {{-- Alert header --}}
-    @if(! empty($title) || ! empty($icon))
+    @if(! empty($title) || (! empty($icon) && ! empty($title)))
         <h5>
-            @if(! empty($icon))
+            @if(! empty($icon) && ! empty($title))
                 <i class="icon {{ $icon }}"></i>
             @endif
 
