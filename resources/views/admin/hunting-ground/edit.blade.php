@@ -7,18 +7,12 @@
 @stop
 
 @section('content')
-    @if(session()->has('success'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-check"></i> Zapisano!</h4>
-            Dane zostały zapisane poprawnie.
-        </div>
-    @endif
+    @include('partials.alerts')
     <form id="district_edit" role="form"
           action="{{ route('hunting-ground.update', ['district_id' => $huntingGround->parent_id, 'id' => $huntingGround->id]) }}"
           method="post">
-    {!! csrf_field() !!}
-    {{ method_field('patch') }}
+        {!! csrf_field() !!}
+        {{ method_field('patch') }}
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <!-- general form elements -->
@@ -47,11 +41,11 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="hunting_ground_description">Opis</label>
-                                    <textarea rows="3"
+                                    <textarea rows="3" maxlength="500"
                                               class="form-control {{ $errors->has('hunting_ground_description') ? 'is-invalid' : '' }}"
                                               name="hunting_ground_description"
                                               id="hunting_ground_description"
-                                              placeholder="Opis">@if(isset($huntingGround->description)){{ $huntingGround->description }}@endif</textarea>
+                                              placeholder="Opis">{{ old('hunting_ground_description') ?? $huntingGround->description }}</textarea>
                                     @if ($errors->has('hunting_ground_description'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('hunting_ground_description') }}
@@ -68,10 +62,12 @@
                                     <select
                                         class="form-control {{ $errors->has('hunting_ground_disabled') ? 'is-invalid' : '' }}"
                                         name="hunting_ground_disabled" id="hunting_ground_disabled">
-                                        <option value="0" @if($huntingGround->disabled == 0) selected @endif>
+                                        <option
+                                            value="0" {{ (old() ? old('hunting_ground_disabled', true) == false : $huntingGround->disabled == false ?? false) ? 'selected' : '' }}>
                                             Odblokowany
                                         </option>
-                                        <option value="1" @if($huntingGround->disabled == 1) selected @endif>
+                                        <option
+                                            value="1" {{ (old() ? old('hunting_ground_disabled', true) == true : $huntingGround->disabled == true ?? true) ? 'selected' : '' }}>
                                             Zablokowany
                                         </option>
                                     </select>
@@ -94,6 +90,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
             </div>

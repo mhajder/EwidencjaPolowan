@@ -7,9 +7,10 @@
 @stop
 
 @section('content')
+    @include('partials.alerts')
     <form id="hunting_ground_create" role="form"
           action="{{ route('hunting-ground.store', ['district_id' => $district->id]) }}" method="post">
-    {!! csrf_field() !!}
+        {!! csrf_field() !!}
         <div class="row justify-content-center">
             <div class="col-md-8 col-md-offset-2">
                 <!-- general form elements -->
@@ -21,7 +22,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunting_ground_name">Nazwa rewiru*</label>
-                                    <input type="text"
+                                    <input type="text" value="{{ old('hunting_ground_name') }}" maxlength="50"
                                            class="form-control {{ $errors->has('hunting_ground_name') ? 'is-invalid' : '' }}"
                                            name="hunting_ground_name" id="hunting_ground_name"
                                            placeholder="Nazwa rewiru" autofocus required>
@@ -35,7 +36,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunting_ground_code">Kod rewiru*</label>
-                                    <input type="text"
+                                    <input type="text" value="{{ old('hunting_ground_code') }}" maxlength="15"
                                            class="form-control {{ $errors->has('hunting_ground_code') ? 'is-invalid' : '' }}"
                                            name="hunting_ground_code" id="hunting_ground_code"
                                            placeholder="Kod rewiru" required>
@@ -52,10 +53,11 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="hunting_ground_description">Opis</label>
-                                    <textarea rows="3"
+                                    <textarea rows="3" maxlength="500"
                                               class="form-control {{ $errors->has('hunting_ground_description') ? 'is-invalid' : '' }}"
                                               name="hunting_ground_description"
-                                              id="hunting_ground_description" placeholder="Opis"></textarea>
+                                              id="hunting_ground_description"
+                                              placeholder="Opis">{{ old('hunting_ground_description') }}</textarea>
                                     @if ($errors->has('hunting_ground_description'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('hunting_ground_description') }}
@@ -72,8 +74,14 @@
                                     <select
                                         class="form-control {{ $errors->has('hunting_ground_disabled') ? 'is-invalid' : '' }}"
                                         name="hunting_ground_disabled" id="hunting_ground_disabled">
-                                        <option value="0" selected>Odblokowany</option>
-                                        <option value="1">Zablokowany</option>
+                                        <option
+                                            value="0" {{ (old() ? old('hunting_ground_disabled', true) == false : false) ? 'selected' : '' }}>
+                                            Odblokowany
+                                        </option>
+                                        <option
+                                            value="1" {{ (old() ? old('hunting_ground_disabled', true) == true : false) ? 'selected' : '' }}>
+                                            Zablokowany
+                                        </option>
                                     </select>
                                     @if ($errors->has('hunting_ground_disabled'))
                                         <span class="invalid-feedback">

@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Zarządzanie rewirami')
+@section('title', 'Zarządzanie rewirami dla obwodu "' . $district->name . '"')
 
 @section('content_header')
-    <h1>Zarządzanie rewirami</h1>
+    <h1>Zarządzanie rewirami dla obwodu "{{ $district->name }}"</h1>
 @stop
 
 @section('js')
@@ -25,13 +25,7 @@
 @stop
 
 @section('content')
-    @if(session()->has('success'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-check"></i> Dodanie rewiru!</h4>
-            {{ session()->get('success') }}
-        </div>
-    @endif
+    @include('partials.alerts')
     <div class="row">
         <div class="col-md-12">
             <div class="card">

@@ -33,12 +33,9 @@ class HuntingGroundController extends Controller
      */
     public function index($district_id): Renderable
     {
-        $district = District::whereNull('parent_id')->where('id', '=', $district_id)->first();
-        if (isset($district->id)) {
-            $huntingGrounds = District::where('parent_id', '=', $district->id)->get();
-            return view('admin.hunting-ground.index')->with('huntingGrounds', $huntingGrounds);
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono obwodu', 'error_message' => 'Obwód o podanym ID nie istnieje!'));
+        $district = District::whereNull('parent_id')->findOrFail($district_id);
+
+        return view('admin.hunting-ground.index')->withDistrict($district)->withHuntingGrounds($district->huntingGrounds);
     }
 
     /**
@@ -49,11 +46,9 @@ class HuntingGroundController extends Controller
      */
     public function create($district_id): Renderable
     {
-        $district = District::whereNull('parent_id')->where('id', '=', $district_id)->first();
-        if (isset($district->id)) {
-            return view('admin.hunting-ground.create')->with('district', $district);
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono obwodu', 'error_message' => 'Obwód o podanym ID nie istnieje!'));
+        $district = District::whereNull('parent_id')->findOrFail($district_id);
+
+        return view('admin.hunting-ground.create')->withDistrict($district);
     }
 
     /**
@@ -66,30 +61,26 @@ class HuntingGroundController extends Controller
      */
     public function store(Request $request, $district_id)
     {
-        $district = District::whereNull('parent_id')->where('id', '=', $district_id)->first();
-        if (isset($district->id)) {
-            $this->validate($request, [
-                'hunting_ground_name' => 'required|string|max:50',
-                'hunting_ground_code' => 'required|string|max:15',
-                'hunting_ground_description' => 'string|max:500|nullable',
-                'hunting_ground_disabled' => 'required|boolean',
-            ]);
+        $district = District::whereNull('parent_id')->findOrFail($district_id);
 
-            $huntingGroundData = [
-                'name' => $request->hunting_ground_name,
-                'code' => $request->hunting_ground_code,
-                'description' => $request->hunting_ground_description,
-                'disabled' => $request->hunting_ground_disabled,
-                'parent_id' => $district->id,
-            ];
+        $this->validate($request, [
+            'hunting_ground_name' => ['required', 'string', 'max:50'],
+            'hunting_ground_code' => ['required', 'string', 'max:15'],
+            'hunting_ground_description' => ['nullable', 'string', 'max:500'],
+            'hunting_ground_disabled' => ['required', 'boolean'],
+        ]);
 
-            $newHuntingGround = District::create($huntingGroundData);
+        District::create([
+            'name' => $request->hunting_ground_name,
+            'code' => $request->hunting_ground_code,
+            'description' => $request->hunting_ground_description,
+            'disabled' => $request->hunting_ground_disabled,
+            'parent_id' => $district->id,
+        ]);
 
-            $message = 'Rewir ' . $request->district_name . ' został dodany prawidłowo.';
-
-            return redirect()->route('hunting-ground.index', ['district_id' => $district->id])->with('success', $message);
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono obwodu', 'error_message' => 'Obwód o podanym ID nie istnieje!'));
+        return redirect()->route('hunting-ground.index', ['district_id' => $district->id])->withAlertsSuccess([
+            ['title' => 'Dodano rewir!', 'message' => 'Rewir ' . $request->hunting_ground_name . ' został dodany prawidłowo.'],
+        ]);
     }
 
     /**
@@ -101,14 +92,9 @@ class HuntingGroundController extends Controller
      */
     public function edit($district_id, $id): Renderable
     {
-        $huntingGround = District::findOrFail($id);
+        $huntingGround = District::where('parent_id', '=', $district_id)->findOrFail($id);
 
-        if (isset($huntingGround->id)) {
-            if ($huntingGround->parent_id != null) {
-                return view('admin.hunting-ground.edit')->with('huntingGround', $huntingGround);
-            }
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono rewiru', 'error_message' => 'Rewir o podanym ID nie istnieje!'));
+        return view('admin.hunting-ground.edit')->withHuntingGround($huntingGround);
     }
 
     /**
@@ -123,17 +109,19 @@ class HuntingGroundController extends Controller
     public function update(Request $request, $district_id, $id): RedirectResponse
     {
         $this->validate($request, [
-            'hunting_ground_description' => 'string|max:500|nullable',
-            'hunting_ground_disabled' => 'required|boolean',
+            'hunting_ground_description' => ['nullable', 'string', 'max:500'],
+            'hunting_ground_disabled' => ['required', 'boolean'],
         ]);
 
-        $district = District::findOrFail($id);
+        $huntingGround = District::where('parent_id', '=', $district_id)->findOrFail($id);
 
-        $district->forceFill([
+        $huntingGround->forceFill([
             'description' => $request->hunting_ground_description,
             'disabled' => $request->hunting_ground_disabled,
         ])->save();
 
-        return redirect()->back()->with('success', true);
+        return redirect()->back()->withAlertsSuccess([
+            ['title' => 'Zapisano!', 'message' => 'Dane zostały zapisane poprawnie.'],
+        ]);
     }
 }
