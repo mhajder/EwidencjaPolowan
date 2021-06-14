@@ -7,16 +7,10 @@
 @stop
 
 @section('content')
-    @if(session()->has('success'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-check"></i> Zapisano!</h4>
-            Dane zostały zapisane poprawnie.
-        </div>
-    @endif
+    @include('partials.alerts')
     <form id="district_edit" role="form" action="{{ route('district.update', ['id' => $district->id]) }}" method="post">
-    {!! csrf_field() !!}
-    {{ method_field('patch') }}
+        {!! csrf_field() !!}
+        {{ method_field('patch') }}
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <!-- general form elements -->
@@ -45,15 +39,15 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="district_description">Opis</label>
-                                    <textarea rows="3"
+                                    <textarea rows="3" maxlength="500"
                                               class="form-control {{ $errors->has('district_description') ? 'is-invalid' : '' }}"
                                               name="district_description"
                                               id="district_description"
-                                              placeholder="Opis">@if(isset($district->description)){{ $district->description }}@endif</textarea>
+                                              placeholder="Opis">{{ old('district_description') ?? $district->description }}</textarea>
                                     @if ($errors->has('district_description'))
                                         <span class="invalid-feedback">
-                                        {{ $errors->first('district_description') }}
-                                    </span>
+                                            {{ $errors->first('district_description') }}
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -67,15 +61,17 @@
                                     <select
                                         class="form-control {{ $errors->has('district_disabled') ? 'is-invalid' : '' }}"
                                         name="district_disabled" id="district_disabled">
-                                        <option value="0" @if($district->disabled == 0) selected @endif>Odblokowany
+                                        <option value="0" {{ (old() ? old('district_disabled', true) == false : $district->disabled == false ?? false) ? 'selected' : '' }}>
+                                            Odblokowany
                                         </option>
-                                        <option value="1" @if($district->disabled == 1) selected @endif>Zablokowany
+                                        <option value="1" {{ (old() ? old('district_disabled', true) == true : $district->disabled == true ?? true) ? 'selected' : '' }}>
+                                            Zablokowany
                                         </option>
                                     </select>
                                     @if ($errors->has('district_disabled'))
                                         <span class="invalid-feedback">
-                                        {{ $errors->first('district_disabled') }}
-                                    </span>
+                                            {{ $errors->first('district_disabled') }}
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -93,7 +89,6 @@
                     </div>
 
                 </div>
-
 
             </div>
         </div>

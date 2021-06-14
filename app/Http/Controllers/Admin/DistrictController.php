@@ -34,7 +34,7 @@ class DistrictController extends Controller
     {
         $districts = District::whereNull('parent_id')->get();
 
-        return view('admin.district.index')->with('districts', $districts);
+        return view('admin.district.index')->withDistricts($districts);
     }
 
     /**
@@ -57,24 +57,22 @@ class DistrictController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $this->validate($request, [
-            'district_name' => 'required|string|max:50',
-            'district_code' => 'required|string|max:15',
-            'district_description' => 'string|max:500|nullable',
-            'district_disabled' => 'required|boolean',
+            'district_name' => ['required', 'string', 'max:50'],
+            'district_code' => ['required', 'string', 'max:15'],
+            'district_description' => ['nullable', 'string', 'max:500'],
+            'district_disabled' => ['required', 'boolean'],
         ]);
 
-        $districtData = [
+        District::create([
             'name' => $request->district_name,
             'code' => $request->district_code,
             'description' => $request->district_description,
             'disabled' => $request->district_disabled,
-        ];
+        ]);
 
-        $newDistrict = District::create($districtData);
-
-        $message = 'Obwód ' . $request->district_name . ' został dodany prawidłowo.';
-
-        return redirect()->route('district.index')->with('success', $message);
+        return redirect()->route('district.index')->withAlertsSuccess([
+            ['title' => 'Dodano obwód!', 'message' => 'Obwód "' . $request->district_name . '" został dodany prawidłowo.'],
+        ]);
     }
 
     /**
@@ -85,14 +83,9 @@ class DistrictController extends Controller
      */
     public function edit($id): Renderable
     {
-        $district = District::findOrFail($id);
+        $district = District::whereNull('parent_id')->findOrFail($id);
 
-        if (isset($district->id)) {
-            if ($district->parent_id == null) {
-                return view('admin.district.edit')->with('district', $district);
-            }
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono obwodu', 'error_message' => 'Obwód o podanym ID nie istnieje!'));
+        return view('admin.district.edit')->withDistrict($district);
     }
 
     /**
@@ -106,17 +99,19 @@ class DistrictController extends Controller
     public function update(Request $request, $id): RedirectResponse
     {
         $this->validate($request, [
-            'district_description' => 'string|max:500|nullable',
-            'district_disabled' => 'required|boolean',
+            'district_description' => ['nullable', 'string', 'max:500'],
+            'district_disabled' => ['required', 'boolean'],
         ]);
 
-        $district = District::findOrFail($id);
+        $district = District::whereNull('parent_id')->findOrFail($id);
 
         $district->forceFill([
             'description' => $request->district_description,
             'disabled' => $request->district_disabled,
         ])->save();
 
-        return redirect()->back()->with('success', true);
+        return redirect()->back()->withAlertsSuccess([
+            ['title' => 'Zapisano!', 'message' => 'Dane zostały zapisane poprawnie.'],
+        ]);
     }
 }

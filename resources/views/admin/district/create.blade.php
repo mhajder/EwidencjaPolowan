@@ -7,6 +7,7 @@
 @stop
 
 @section('content')
+    @include('partials.alerts')
     <form id="district_create" role="form" action="{{ route('district.store') }}" method="post">
     {!! csrf_field() !!}
         <div class="row justify-content-center">
@@ -20,10 +21,9 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="district_name">Nazwa obwodu*</label>
-                                    <input type="text"
+                                    <input type="text" value="{{ old('district_name') }}" maxlength="50"
                                            class="form-control {{ $errors->has('district_name') ? 'is-invalid' : '' }}"
-                                           name="district_name" id="district_name"
-                                           placeholder="Nazwa obwodu" autofocus required>
+                                           name="district_name" id="district_name" placeholder="Nazwa obwodu" required>
                                     @if ($errors->has('district_name'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('district_name') }}
@@ -34,10 +34,9 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="district_code">Kod obwodu*</label>
-                                    <input type="text"
+                                    <input type="text" value="{{ old('district_code') }}" maxlength="15"
                                            class="form-control {{ $errors->has('district_code') ? 'is-invalid' : '' }}"
-                                           name="district_code" id="district_code"
-                                           placeholder="Kod obwodu" required>
+                                           name="district_code" id="district_code" placeholder="Kod obwodu" required>
                                     @if ($errors->has('district_code'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('district_code') }}
@@ -51,10 +50,10 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="district_description">Opis</label>
-                                    <textarea rows="3"
+                                    <textarea rows="3" maxlength="500"
                                               class="form-control {{ $errors->has('district_description') ? 'is-invalid' : '' }}"
-                                              name="district_description"
-                                              id="district_description" placeholder="Opis"></textarea>
+                                              name="district_description" id="district_description"
+                                              placeholder="Opis">{{ old('district_description') }}</textarea>
                                     @if ($errors->has('district_description'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('district_description') }}
@@ -71,8 +70,12 @@
                                     <select
                                         class="form-control {{ $errors->has('district_disabled') ? 'is-invalid' : '' }}"
                                         name="district_disabled" id="district_disabled">
-                                        <option value="0" selected>Odblokowany</option>
-                                        <option value="1">Zablokowany</option>
+                                        <option value="0" {{ (old() ? old('district_disabled', true) == false : false) ? 'selected' : '' }}>
+                                            Odblokowany
+                                        </option>
+                                        <option value="1" {{ (old() ? old('district_disabled', true) == true : false) ? 'selected' : '' }}>
+                                            Zablokowany
+                                        </option>
                                     </select>
                                     @if ($errors->has('district_disabled'))
                                         <span class="invalid-feedback">
@@ -93,6 +96,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
             </div>
