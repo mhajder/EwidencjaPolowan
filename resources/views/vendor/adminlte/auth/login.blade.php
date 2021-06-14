@@ -21,7 +21,7 @@
 @section('auth_header', __('adminlte::adminlte.login_message'))
 
 @section('auth_body')
-    @include('alerts')
+    @include('partials.alerts')
     <form action="{{ $login_url }}" method="post">
         {{ csrf_field() }}
 
