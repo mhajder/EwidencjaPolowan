@@ -23,7 +23,8 @@
                                     <label for="district_name">Nazwa obwodu*</label>
                                     <input type="text" value="{{ old('district_name') }}" maxlength="50"
                                            class="form-control {{ $errors->has('district_name') ? 'is-invalid' : '' }}"
-                                           name="district_name" id="district_name" placeholder="Nazwa obwodu" required>
+                                           name="district_name" id="district_name" placeholder="Nazwa obwodu"
+                                           autofocus required>
                                     @if ($errors->has('district_name'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('district_name') }}
