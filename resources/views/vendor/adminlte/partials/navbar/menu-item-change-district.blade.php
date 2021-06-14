@@ -13,7 +13,7 @@
         @foreach ($districts as $district)
             @if($district->id != Auth::user()->selected_district)
                 <div class="dropdown-divider"></div>
-                <a href="{{ route('district.change', ['district_id' => $district->id ]) }}" class="dropdown-item">
+                <a href="{{ route('district.change', ['district_id' => $district->id ]) }}" class="dropdown-item text-wrap">
                     {{ $district->name }}
                     <span class="float-right text-muted text-sm">{{ $district->code }}</span>
                 </a>
