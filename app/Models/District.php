@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -41,4 +42,14 @@ class District extends Model
         'updated_at',
         'deleted_at'
     ];
+
+    /**
+     * Get a hunting grounds from a given district.
+     *
+     * @return HasMany
+     */
+    public function huntingGrounds(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
 }
