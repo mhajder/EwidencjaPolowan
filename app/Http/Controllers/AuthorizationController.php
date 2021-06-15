@@ -35,8 +35,7 @@ class AuthorizationController extends Controller
     {
         $authorizations = Authorization::where('user_id', '=', $request->user()->id)->where('district_id', '=', $request->user()->selected_district)->get();
 
-        return view('authorization.index')->with('authorizations', $authorizations);
-
+        return view('authorization.index')->withAuthorizations($authorizations);
     }
 
     /**
@@ -58,26 +57,24 @@ class AuthorizationController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-
         $this->validate($request, [
-            'authorization_name' => 'required|string|max:50',
-            'authorization_number' => 'required|string|max:15',
-            'authorization_valid_from' => 'required|date',
-            'authorization_valid_until' => 'required|date|after:authorization_valid_from',
+            'authorization_name' => ['required', 'string', 'max:50'],
+            'authorization_number' => ['required', 'string', 'max:15'],
+            'authorization_valid_from' => ['required', 'date'],
+            'authorization_valid_until' => ['required', 'date', 'after:authorization_valid_from'],
         ]);
 
-        $authorizationData = [
+        Authorization::create([
             'user_id' => $request->user()->id,
             'name' => $request->authorization_name,
             'number' => $request->authorization_number,
             'valid_from' => date(Helper::MYSQL_DATETIME_FORMAT, strtotime($request->authorization_valid_from)),
             'valid_until' => date(Helper::MYSQL_DATETIME_FORMAT, strtotime($request->authorization_valid_until)),
             'district_id' => $request->user()->selected_district,
-        ];
+        ]);
 
-        Authorization::create($authorizationData);
-
-        $message = 'Upoważnienie ' . $request->authorization_name . ' zostało dodane prawidłowo.';
-        return redirect()->route('authorization.index')->with('success', $message);
+        return redirect()->route('authorization.index')->withAlertsSuccess([
+            ['title' => 'Dodano upoważnienie!', 'message' => 'Upoważnienie ' . $request->authorization_name . ' zostało dodane prawidłowo.'],
+        ]);
     }
 }

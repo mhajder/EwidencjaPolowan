@@ -7,6 +7,7 @@
 @stop
 
 @section('content')
+    @include('partials.alerts')
     <form id="authorization_create" role="form" action="{{ route('authorization.store') }}" method="post">
     {!! csrf_field() !!}
     <!-- left column -->
@@ -14,7 +15,6 @@
             <div class="col-md-8">
                 <!-- general form elements -->
                 <div class="card card-primary">
-
                     <!-- /.card-header -->
 
                     <div class="card-body">
@@ -22,7 +22,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="authorization_name">Nazwa*</label>
-                                    <input type="text"
+                                    <input type="text" value="{{ old('authorization_name') }}" maxlength="50"
                                            class="form-control {{ $errors->has('authorization_name') ? 'is-invalid' : '' }}"
                                            name="authorization_name" id="authorization_name"
                                            placeholder="Nazwa" autofocus required>
@@ -36,7 +36,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="authorization_number">Numer*</label>
-                                    <input type="text"
+                                    <input type="text" value="{{ old('authorization_number') }}" maxlength="15"
                                            class="form-control {{ $errors->has('authorization_number') ? 'is-invalid' : '' }}"
                                            name="authorization_number" id="authorization_number"
                                            placeholder="Numer" required>
@@ -50,14 +50,34 @@
                         </daiv>
                         <div class="row justify-content-center">
                             <div class="form-group col-md-6">
+                                @php
+                                    if (old('authorization_valid_from')) {
+                                        if (Helper::checkIfDateIsValid(old('authorization_valid_from'))) {
+                                            $authorization_valid_from_value = Carbon::parse(old('authorization_valid_from'))->format(Helper::AUTHORIZATION_DATE_RANGE_PICKER_FORMAT);
+                                        } else {
+                                            $authorization_valid_from_value  = '';
+                                        }
+
+                                        if (Helper::checkIfDateIsValid(old('authorization_valid_until'))) {
+                                            $authorization_valid_until = Carbon::parse(old('authorization_valid_until'))->format(Helper::AUTHORIZATION_DATE_RANGE_PICKER_FORMAT);
+                                        } else {
+                                            $authorization_valid_until  = '';
+                                        }
+                                        $authorization_valid = $authorization_valid_from_value . ' - ' . $authorization_valid_until;
+                                    }
+                                @endphp
                                 <label for="authorization_valid">Od/do*</label>
                                 <input
                                     class="form-control {{ $errors->has('authorization_valid_from') || $errors->has('authorization_valid_until') ? 'is-invalid' : '' }}"
-                                    id="authorization_valid" required>
+                                    id="authorization_valid" value="{{ $authorization_valid ?? ''}}" required>
                                 <input type="hidden" class="form-control" name="authorization_valid_from"
-                                       id="authorization_valid_from" required>
+                                       id="authorization_valid_from"
+                                       value="{{ old('authorization_valid_from') ? ( Helper::checkIfDateIsValid(old('authorization_valid_from')) ? Carbon::parse(old('authorization_valid_from'))->toRfc1123String() : false) : ''}}"
+                                       required>
                                 <input type="hidden" class="form-control" name="authorization_valid_until"
-                                       id="authorization_valid_until" required>
+                                       id="authorization_valid_until"
+                                       value="{{ old('authorization_valid_until') ? ( Helper::checkIfDateIsValid(old('authorization_valid_until')) ? Carbon::parse(old('authorization_valid_until'))->toRfc1123String() : false) : ''}}"
+                                       required>
                                 @if ($errors->has('authorization_valid_from'))
                                     <span class="invalid-feedback">
                                         {{ $errors->first('authorization_valid_from') }}
@@ -97,7 +117,7 @@
             "showDropdowns": true,
             "minYear": 2015,
             "maxYear": 2050,
-            autoUpdateInput: false,
+            "autoUpdateInput": false,
             "locale": {
                 "format": "DD/MM/YYYY",
                 "separator": " - ",
