@@ -15,9 +15,13 @@ class Helper
      */
     const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
     /**
-     * Date Range Picker date format
+     * Hunting Date Range Picker date format
      */
-    const DATE_RANGE_PICKER_FORMAT = 'd/m/Y H:i';
+    const HUNTING_DATE_RANGE_PICKER_FORMAT = 'd/m/Y H:i';
+    /**
+     * Authorization Date Range Picker date format
+     */
+    const AUTHORIZATION_DATE_RANGE_PICKER_FORMAT = 'd/m/Y';
 
     /**
      * Get nearest time rounded up with minimum.
@@ -48,6 +52,17 @@ class Helper
     public static function checkIfAuthorizationIsValid(string $valid_from, string $valid_until): bool
     {
         return Carbon::now()->between(Carbon::parse($valid_from), Carbon::parse($valid_until));
+    }
+
+    /**
+     * Check if date is valid.
+     *
+     * @param string $date
+     * @return bool
+     */
+    public static function checkIfDateIsValid(string $date): bool
+    {
+        return empty(strtotime($date)) ? false : true;
     }
 }
 
