@@ -19,12 +19,12 @@ class CreateUsersTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('pesel',11)->unique();
-            $table->string('email')->nullable();
+            $table->string('email')->nullable()->unique();
             $table->string('street')->nullable();
             $table->string('house_number')->nullable();
             $table->string('zip_code')->nullable();
             $table->string('city')->nullable();
-            $table->string('phone')->nullable();
+            $table->string('phone')->nullable()->unique();
             $table->string('password');
             $table->unsignedSmallInteger('permission')->default('1');
             $table->integer('selected_district')->default('1');
