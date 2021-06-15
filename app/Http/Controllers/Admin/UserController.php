@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -36,7 +37,7 @@ class UserController extends Controller
     {
         $users = User::all();
 
-        return view('admin.user.index')->with('users', $users);
+        return view('admin.user.index')->withUsers($users);
     }
 
     /**
@@ -59,22 +60,26 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $this->validate($request, [
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'pesel' => 'required|string|max:11|unique:App\Models\User|PESEL',
-            'username' => 'required|string|max:50|unique:App\Models\User',
-            'password' => 'required|string|confirmed|min:8|max:64',
-            'permission' => 'required|integer|in:1,9',
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'pesel' => ['required', 'PESEL', 'unique:App\Models\User'],
+            'username' => ['required', 'string', 'max:50', 'unique:App\Models\User'],
+            'password' => ['required', 'string', 'confirmed', 'min:8', 'max:64'],
+            'permission' => ['required', new EnumValue(UserRoles::class, false)],
 
-            'street' => 'string|max:100|nullable',
-            'house_number' => 'string|max:10|nullable',
-            'zip_code' => 'string|max:10|nullable|postal_code:PL',
-            'city' => 'string|max:50|nullable',
-            'email' => 'string|max:250|email|nullable',
-            'phone' => 'string|max:25|nullable|phone:PL',
+            'street' => ['nullable', 'string', 'max:100'],
+            'house_number' => ['nullable', 'string', 'max:10'],
+            'zip_code' => ['nullable', 'string', 'max:10', 'post_code'],
+            'city' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'string', 'max:250', 'email'],
+            'phone' => ['nullable', 'string', 'max:25', 'phone:PL'],
         ]);
 
-        $userData = [
+        if (isset($request->phone)) {
+            $request->phone = phone($request->phone, 'PL');
+        }
+
+        User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'pesel' => $request->pesel,
@@ -88,12 +93,11 @@ class UserController extends Controller
             'city' => $request->city,
             'email' => $request->email,
             'phone' => $request->phone,
-        ];
+        ]);
 
-        User::create($userData);
-
-        $message = 'Użytkownik ' . $request->first_name . ' ' . $request->last_name . ' został dodany prawidłowo.';
-        return redirect()->route('user.index')->with('success', $message);
+        return redirect()->route('user.index')->withAlertsSuccess([
+            ['title' => 'Dodano użytkownika!', 'message' => 'Użytkownik ' . $request->name . ' został dodany prawidłowo.'],
+        ]);
     }
 
     /**
@@ -104,14 +108,9 @@ class UserController extends Controller
      */
     public function edit($id): Renderable
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
 
-        if (isset($user->id)) {
-            if ($user->permission <= 9) {
-                return view('admin.user.edit')->with('user', $user);
-            }
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono użytkownika', 'error_message' => 'Użytkownik o podanym ID nie istnieje!'));
+        return view('admin.user.edit')->withUser($user);
     }
 
     /**
@@ -125,17 +124,21 @@ class UserController extends Controller
     public function update(Request $request, $id): RedirectResponse
     {
         $this->validate($request, [
-            'permission' => 'required|integer|max:9|in:1,9',
+            'permission' => ['required', new EnumValue(UserRoles::class, false)],
 
-            'street' => 'string|max:100|nullable',
-            'house_number' => 'string|max:10|nullable',
-            'zip_code' => 'string|max:10|nullable|postal_code:PL',
-            'city' => 'string|max:50|nullable',
-            'email' => 'string|max:250|email|nullable',
-            'phone' => 'string|max:25|nullable|phone:PL',
+            'street' => ['nullable', 'string', 'max:100'],
+            'house_number' => ['nullable', 'string', 'max:10'],
+            'zip_code' => ['nullable', 'string', 'max:10', 'post_code'],
+            'city' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'string', 'max:250', 'email'],
+            'phone' => ['nullable', 'string', 'max:25', 'phone:PL'],
         ]);
 
         $user = User::findOrFail($id);
+
+        if (isset($request->phone)) {
+            $request->phone = phone($request->phone, 'PL');
+        }
 
         $user->forceFill([
             'permission' => $request->permission,
@@ -150,14 +153,16 @@ class UserController extends Controller
 
         if (isset($request->password) || isset($request->password_confirmation)) {
             $this->validate($request, [
-                'password' => 'string|confirmed|min:8|max:64',
+                'password' => 'required|string|confirmed|min:8|max:64',
             ]);
 
             $user->forceFill([
                 'password' => Hash::make($request->password),
             ])->save();
         }
-        return redirect()->back()->with('success', true);
+        return redirect()->back()->withAlertsSuccess([
+            ['title' => 'Zapisano!', 'message' => 'Dane zostały zapisane poprawnie.'],
+        ]);
     }
 
     /**
@@ -165,29 +170,38 @@ class UserController extends Controller
      *
      * @param Request $request
      * @param $id
-     * @return Renderable|RedirectResponse|Redirector
+     * @return Renderable|RedirectResponse
      */
     public function block(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
-        if (isset($user->id)) {
-            if ($user->permission < 9 && $user->id != $request->user()->id) {
-                if ($user->disabled == false) {
-                    $user->forceFill([
-                        'disabled' => true,
-                    ])->save();
-                } else {
-                    $user->forceFill([
-                        'disabled' => false,
-                    ])->save();
-                }
-                $message = 'Użytkownik ' . $request->first_name . ' ' . $request->last_name . ' został zablokowany prawidłowo.';
-                return redirect()->route('user.index')->with('success', $message);
-
-            }
-            return view('id_error')->with(array('error_title' => 'Błąd podczas edycji użytkownika', 'error_message' => 'Nie można zablokować samego siebie oraz użytkownika z funkcją administratora!'));
+        // Check if the user is blocking himself
+        if ($user->id == $request->user()->id) {
+            return redirect()->route('user.edit', ['id' => $user->id])->withAlertsDanger([
+                ['title' => 'Nie można zablokować samego siebie!', 'message' => 'System nie pozwala na blokadę własnego konta.'],
+            ]);
         }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono użytkownika', 'error_message' => 'Użytkownik o podanym ID nie istnieje!'));
+
+        // Check if the blocked user is the administrator
+        if ($user->permission == 9) {
+            return redirect()->route('user.edit', ['id' => $user->id])->withAlertsDanger([
+                ['title' => 'Nie można zablokować użytkownika!', 'message' => 'Użytkownik posiada funkcję administratora, zmień funkcję na użytkownika aby móc go zablokować.'],
+            ]);
+        }
+
+        if ($user->disabled == false) {
+            $user->forceFill([
+                'disabled' => true,
+            ])->save();
+        } else {
+            $user->forceFill([
+                'disabled' => false,
+            ])->save();
+        }
+
+        return redirect()->route('user.edit', ['id' => $user->id])->withAlertsSuccess([
+            ['title' => 'Zablokowano użytkownika!', 'message' => 'Użytkownik ' . $request->name . ' został zablokowany prawidłowo.'],
+        ]);
     }
 }

@@ -25,13 +25,7 @@
 @stop
 
 @section('content')
-    @if(session()->has('success'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-check"></i> Dodano użytkownika!</h4>
-            {{ session()->get('success') }}
-        </div>
-    @endif
+    @include('partials.alerts')
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -66,7 +60,7 @@
                                 <td>{{ $user->last_name }}</td>
                                 <td>{{ $user->pesel }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->phone }}</td>
+                                <td>{{ $user->phone ? phone($user->phone, 'PL', 1) : ''}}</td>
                                 <td>{{ $user->street }}</td>
                                 <td>{{ $user->house_number }}</td>
                                 <td>{{ $user->zip_code }}</td>
@@ -78,8 +72,9 @@
                                 @endif
                                 <td>{{ \App\Enums\UserRoles::getDescription($user->permission) }}</td>
                                 <td>
-                                    <a class="btn btn-danger" href="{{ route('user.edit', ['id' => $user->id]) }}"><i
-                                            class="fa fa-edit"></i></a>
+                                    <a class="btn btn-danger" href="{{ route('user.edit', ['id' => $user->id]) }}">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
