@@ -61,10 +61,10 @@
                                     <select
                                         class="form-control {{ $errors->has('district_disabled') ? 'is-invalid' : '' }}"
                                         name="district_disabled" id="district_disabled">
-                                        <option value="0" {{ (old() ? old('district_disabled', true) == false : $district->disabled == false ?? false) ? 'selected' : '' }}>
+                                        <option value="0" {{ (old() ? old('district_disabled', true) == false : $district->disabled == false) ? 'selected' : '' }}>
                                             Odblokowany
                                         </option>
-                                        <option value="1" {{ (old() ? old('district_disabled', true) == true : $district->disabled == true ?? true) ? 'selected' : '' }}>
+                                        <option value="1" {{ (old() ? old('district_disabled', true) == true : $district->disabled == true) ? 'selected' : '' }}>
                                             Zablokowany
                                         </option>
                                     </select>

@@ -63,11 +63,11 @@
                                         class="form-control {{ $errors->has('hunting_ground_disabled') ? 'is-invalid' : '' }}"
                                         name="hunting_ground_disabled" id="hunting_ground_disabled">
                                         <option
-                                            value="0" {{ (old() ? old('hunting_ground_disabled', true) == false : $huntingGround->disabled == false ?? false) ? 'selected' : '' }}>
+                                            value="0" {{ (old() ? old('hunting_ground_disabled', true) == false : $huntingGround->disabled == false) ? 'selected' : '' }}>
                                             Odblokowany
                                         </option>
                                         <option
-                                            value="1" {{ (old() ? old('hunting_ground_disabled', true) == true : $huntingGround->disabled == true ?? true) ? 'selected' : '' }}>
+                                            value="1" {{ (old() ? old('hunting_ground_disabled', true) == true : $huntingGround->disabled == true) ? 'selected' : '' }}>
                                             Zablokowany
                                         </option>
                                     </select>
