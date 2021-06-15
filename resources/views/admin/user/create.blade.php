@@ -142,7 +142,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" value="{{ old('email') }}" maxlength="250"
+                                    <input type="email" value="{{ old('email') }}" maxlength="255"
                                            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                                            name="email" id="email" placeholder="Email">
                                     @if ($errors->has('email'))
