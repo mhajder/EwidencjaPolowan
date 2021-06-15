@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -71,7 +72,7 @@ class UserController extends Controller
             'house_number' => ['nullable', 'string', 'max:10'],
             'zip_code' => ['nullable', 'string', 'max:10', 'post_code'],
             'city' => ['nullable', 'string', 'max:50'],
-            'email' => ['nullable', 'string', 'max:250', 'email'],
+            'email' => ['nullable', 'string', 'max:255', 'email:rfc,dns,spoof', 'unique:App\Models\User'],
             'phone' => ['nullable', 'string', 'max:25', 'phone:PL'],
         ]);
 
@@ -130,7 +131,8 @@ class UserController extends Controller
             'house_number' => ['nullable', 'string', 'max:10'],
             'zip_code' => ['nullable', 'string', 'max:10', 'post_code'],
             'city' => ['nullable', 'string', 'max:50'],
-            'email' => ['nullable', 'string', 'max:250', 'email'],
+            'email' => ['nullable', 'string', 'max:255', 'email:rfc,dns,spoof',
+                Rule::unique(User::class, 'email')->ignore($id, 'id')],
             'phone' => ['nullable', 'string', 'max:25', 'phone:PL'],
         ]);
 
