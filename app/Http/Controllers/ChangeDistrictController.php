@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\District;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -29,17 +28,16 @@ class ChangeDistrictController extends Controller
      *
      * @param Request $request
      * @param $district_id
-     * @return RedirectResponse|Renderable
+     * @return RedirectResponse
      */
-    public function changeCurrent(Request $request, $district_id)
+    public function changeCurrent(Request $request, $district_id): RedirectResponse
     {
-        $district = District::where('id', '=', $district_id)->whereNull('parent_id')->first();
-        if (isset($district->id)) {
-            $request->user()->forceFill([
-                'selected_district' => $district->id,
-            ])->save();
-            return redirect()->back()->withInput();
-        }
-        return view('id_error')->with(array('error_title' => 'Nie znaleziono obwodu', 'error_message' => 'Obwód o podanym ID nie istnieje!'));
+        $district = District::whereNull('parent_id')->findOrFail($district_id);
+
+        $request->user()->forceFill([
+            'selected_district' => $district->id,
+        ])->save();
+
+        return redirect()->back()->withInput();
     }
 }
