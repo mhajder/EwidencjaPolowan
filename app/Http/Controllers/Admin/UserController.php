@@ -77,7 +77,12 @@ class UserController extends Controller
         ]);
 
         if (isset($request->phone)) {
-            $request->phone = phone($request->phone, 'PL');
+            $request->request->add([
+                'phone' => phone($request->phone, 'PL'),
+            ]);
+            $this->validate($request, [
+                'phone' => ['unique:App\Models\User'],
+            ]);
         }
 
         User::create([
@@ -139,7 +144,12 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if (isset($request->phone)) {
-            $request->phone = phone($request->phone, 'PL');
+            $request->request->add([
+                'phone' => phone($request->phone, 'PL'),
+            ]);
+            $this->validate($request, [
+                'phone' => [Rule::unique(User::class, 'phone')->ignore($id, 'id')],
+            ]);
         }
 
         $user->forceFill([
