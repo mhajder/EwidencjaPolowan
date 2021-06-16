@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\Helper;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -80,6 +83,48 @@ class User extends Authenticatable
     public function selectedDistrict(): HasOne
     {
         return $this->hasOne(District::class, 'id', 'selected_district');
+    }
+
+    /**
+     * Get the user's valid authorizations in given district.
+     *
+     * @param $district_id
+     * @return HasMany
+     */
+    public function validAuthorizationsInGivenDistrict($district_id): HasMany
+    {
+        $nowDatabaseFormat = date(Helper::MYSQL_DATETIME_FORMAT, strtotime(CarbonImmutable::now()));
+        return $this->authorizationsInGivenDistrict($district_id)
+            ->where('valid_from', '<=', $nowDatabaseFormat)
+            ->where('valid_until', '>=', $nowDatabaseFormat);
+    }
+
+    /**
+     * Get the user's authorizations in given district.
+     *
+     * @param $district_id
+     * @return HasMany
+     */
+    public function authorizationsInGivenDistrict($district_id): HasMany
+    {
+        return $this->hasMany(Authorization::class, 'user_id')
+            ->where('district_id', '=', $district_id);
+    }
+
+    /**
+     * Check if user is hunting in given district or if have planed hunting
+     *
+     * @param $district_id
+     * @return bool
+     */
+    public function checkIfUserIsHuntingInGivenDistrict($district_id): bool
+    {
+        $nowDatabaseFormat = date(Helper::MYSQL_DATETIME_FORMAT, strtotime(CarbonImmutable::now()));
+        return $this->hasMany(HuntingBook::class, 'user_id')
+            ->where('district_id', '=', $district_id)
+            ->where('end', '>', $nowDatabaseFormat)
+            ->where('canceled', '=', 0)
+            ->exists();
     }
 
     /**
