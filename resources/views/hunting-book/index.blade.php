@@ -7,20 +7,7 @@
 @stop
 
 @section('content')
-    @if(session()->has('error'))
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fas fa-ban"></i> Niepowodzenie!</h4>
-            {{ session()->get('error') }}
-        </div>
-    @endif
-    @if(session()->has('success'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-check"></i> Dodano polowanie!</h4>
-            {{ session()->get('success') }}
-        </div>
-    @endif
+    @include('partials.alerts')
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -42,29 +29,20 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @php
-                                $animals = \App\Models\Animal::orderBy('id', 'ASC')->get()->toArray()
-                            @endphp
                             @foreach ($huntings as $hunting)
                                 <tr data-widget="expandable-table" aria-expanded="false">
-                                    @php
-                                        $user = $hunting->user;
-                                        $authorization = $hunting->authorization;
-                                        $huntingGrounds = $hunting->usedHuntingGrounds->pluck('code')->implode(', ');
-                                        $huntedAnimals = $hunting->huntedAnimals
-                                    @endphp
                                     <td>{{ $hunting->hunting_id }}</td>
-                                    <td>{{ $user->first_name }} {{ $user->last_name }}</td>
-                                    <td>{{ $authorization->number }}</td>
-                                    <td>{{ $huntingGrounds }}</td>
-                                    <td>{{ $hunting->start }}</td>
-                                    <td>{{ $hunting->end }}</td>
+                                    <td>{{ $hunting->user->name }}</td>
+                                    <td>{{ $hunting->authorization->number }}</td>
+                                    <td>{{ $hunting->usedHuntingGrounds->pluck('code')->implode(', ') }}</td>
+                                    <td>{{ $hunting->start->format('Y-m-d H:i') }}</td>
+                                    <td>{{ $hunting->end->format('Y-m-d H:i') }}</td>
                                     <td>
                                         @php
-                                            $now = \Carbon\CarbonImmutable::now();
-                                            $huntingStartDate = \Carbon\CarbonImmutable::parse($hunting->start);
-                                            $huntingEndDate = \Carbon\CarbonImmutable::parse($hunting->end);
-                                            $huntingMaxEditDate = \Carbon\CarbonImmutable::parse($hunting->end)->add(1, 'day')
+                                            $now = Carbon::now();
+                                            $huntingStartDate = Carbon::parse($hunting->start);
+                                            $huntingEndDate = Carbon::parse($hunting->end);
+                                            $huntingMaxEditDate = Carbon::parse($hunting->end)->add(1, 'day')
                                         @endphp
                                         @if($hunting->user_id == Auth::user()->id && $huntingStartDate->greaterThan($now) && $hunting->canceled == 0)
                                             <form role="form"
@@ -104,11 +82,11 @@
                                         <div class="col-sm-12" style="display: none;">
                                             <b>Oddana liczba strzałów:</b> {{ $hunting->shots }}
                                         </div>
-                                        @if(count($huntedAnimals) > 0)
+                                        @if(count($hunting->huntedAnimals) > 0)
                                             <div class="col-sm-12" style="display: none;">
                                                 <b>Upolowane zwierzęta:</b>
-                                                @foreach($huntedAnimals as $huntedAnimal)
-                                                    <span class="btn btn-default btn-sm">{{ $animals[$animals[$huntedAnimal->animal_id]['parent_id'] - 1]['name'] }} - {{ $animals[$huntedAnimal->animal_id - 1]['name'] }}</span>
+                                                @foreach($hunting->huntedAnimals as $huntedAnimal)
+                                                    <span class="btn btn-default btn-sm">{{ $animals[$huntedAnimal->animal_category_id - 1]['name'] }} - {{ $animals[$huntedAnimal->animal_id - 1]['name'] }}</span>
                                                 @endforeach
                                             </div>
                                         @endif

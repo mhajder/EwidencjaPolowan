@@ -7,20 +7,13 @@
 @stop
 
 @section('content')
-    @if(session()->has('error'))
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fas fa-ban"></i> Niepowodzenie!</h4>
-            {{ session()->get('error') }}
-        </div>
-    @endif
+    @include('partials.alerts')
     <form id="hunting_create" role="form" action="{{ route('hunting.store') }}" method="post">
         {!! csrf_field() !!}
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <!-- general form elements -->
                 <div class="card card-primary">
-
                     <!-- /.card-header -->
 
                     <div class="card-body">
@@ -29,8 +22,7 @@
                                 <div class="form-group">
                                     <label for="hunting_who">Kto*</label>
                                     <input type="text" class="form-control" id="hunting_who"
-                                           value="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}"
-                                           disabled>
+                                           value="{{ Auth::user()->name }}" disabled>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -39,17 +31,10 @@
                                     <select
                                         class="form-control {{ $errors->has('hunting_authorization') ? 'is-invalid' : '' }}"
                                         name="hunting_authorization" id="hunting_authorization" required>
-                                        @php
-                                            $nowDatabaseFormat = date("Y-m-d", strtotime(now()));
-                                            $authorizations = \App\Models\Authorization::where('user_id', '=', Auth::user()->id)
-                                            ->where('district_id', '=', Auth::user()->selected_district)
-                                            ->where('valid_from', '<=', $nowDatabaseFormat)
-                                            ->where('valid_until', '>=', $nowDatabaseFormat)
-                                            ->get()
-                                        @endphp
                                         @foreach($authorizations as $authorization)
-                                            <option value="{{ $authorization->id }}">{{ $authorization->number }}
-                                                ({{ $authorization->name }})
+                                            <option
+                                                value="{{ $authorization->id }}" {{ (old() ? old('hunting_authorization') == $authorization->id : false) ? 'selected' : '' }}>
+                                                {{ $authorization->number }} ({{ $authorization->name }})
                                             </option>
                                         @endforeach
                                     </select>
@@ -68,13 +53,11 @@
                                     <select
                                         class="form-control select2 {{ $errors->has('hunting_grounds') ? 'is-invalid' : '' }}{{ $errors->has('hunting_grounds.*') ? 'is-invalid' : '' }}"
                                         multiple="multiple" data-placeholder="Wybierz rewiry" name="hunting_grounds[]"
-                                        id="hunting_grounds" style="width: 100%;" required>
-                                        @php
-                                            $huntingGrounds = \App\Models\District::where('parent_id', '=', Auth::user()->selected_district)->where('disabled', '=', 'false')->get()
-                                        @endphp
+                                        id="hunting_grounds" required>
                                         @foreach($huntingGrounds as $huntingGround)
-                                            <option value="{{ $huntingGround->id }}">{{ $huntingGround->name }}
-                                                ({{ $huntingGround->code }})
+                                            <option
+                                                value="{{ $huntingGround->id }}" {{ (old() ? collect(old('hunting_grounds'))->contains($huntingGround->id) == true : false) ? 'selected' : '' }}>
+                                                {{ $huntingGround->name }} ({{ $huntingGround->code }})
                                             </option>
                                         @endforeach
                                     </select>
@@ -93,16 +76,30 @@
                         </div>
                         <hr>
                         <div class="row">
+                            @php
+                                if (old('hunting_start')) {
+                                    if (Helper::checkIfDateIsValid(old('hunting_start'))) {
+                                        $hunting_start = Carbon::parse(old('hunting_start'));
+                                        $hunting_start_formatted = $hunting_start->format(Helper::HUNTING_DATE_RANGE_PICKER_FORMAT);
+                                        $hunting_start_string = $hunting_start->toRfc1123String();
+                                    } else {
+                                        $hunting_start_formatted = old('hunting_start');
+                                        $hunting_start_string = old('hunting_start');
+                                    }
+                                } else {
+                                    $hunting_start = Helper::getNearestTimeRoundedUpWithMinimum(Carbon::now(), 15, 1);
+                                    $hunting_start_formatted = $hunting_start->format(Helper::HUNTING_DATE_RANGE_PICKER_FORMAT);
+                                    $hunting_start_string = $hunting_start->toRfc1123String();
+                                }
+                            @endphp
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunting_start">Data rozpoczęcia*</label>
                                     <input class="form-control {{ $errors->has('hunting_start') ? 'is-invalid' : '' }}"
                                            id="start" placeholder="Start"
-                                           value="{{ Helper::getNearestTimeRoundedUpWithMinimum(Carbon::now(), 15, 1)->format(Helper::DATE_RANGE_PICKER_FORMAT) }}"
-                                           required>
+                                           value="{{ $hunting_start_formatted ?? '' }}" required>
                                     <input type="hidden" class="form-control" name="hunting_start" id="hunting_start"
-                                           value="{{ Helper::getNearestTimeRoundedUpWithMinimum(Carbon::now(), 15, 1)->toRfc1123String() }}"
-                                           required>
+                                           value="{{ $hunting_start_string ?? '' }}" required>
                                     @if ($errors->has('hunting_start'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('hunting_start') }}
@@ -110,13 +107,26 @@
                                     @endif
                                 </div>
                             </div>
+                            @php
+                                if (old('hunting_end')) {
+                                    if (Helper::checkIfDateIsValid(old('hunting_end'))) {
+                                        $hunting_end = Carbon::parse(old('hunting_end'));
+                                        $hunting_end_formatted = $hunting_end->format(Helper::HUNTING_DATE_RANGE_PICKER_FORMAT);
+                                        $hunting_end_string = $hunting_end->toRfc1123String();
+                                    } else {
+                                        $hunting_end_formatted = old('hunting_end');
+                                        $hunting_end_string = old('hunting_end');
+                                    }
+                                }
+                            @endphp
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunting_end">Data zakończenia*</label>
                                     <input class="form-control {{ $errors->has('hunting_end') ? 'is-invalid' : '' }}"
-                                           id="end" placeholder="Koniec" required>
+                                           id="end" placeholder="Koniec"
+                                           value="{{ $hunting_end_formatted ?? '' }}" required>
                                     <input type="hidden" class="form-control" name="hunting_end" id="hunting_end"
-                                           required>
+                                           value="{{ $hunting_end_string ?? '' }}" required>
                                     @if ($errors->has('hunting_end'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('hunting_end') }}
@@ -130,10 +140,9 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="hunting_description">Opis</label>
-                                    <textarea rows="3"
+                                    <textarea rows="3" maxlength="500"
                                               class="form-control {{ $errors->has('hunting_description') ? 'is-invalid' : '' }}"
-                                              name="hunting_description"
-                                              id="hunting_description"
+                                              name="hunting_description" id="hunting_description"
                                               placeholder="Opis">{{ old('hunting_description') }}</textarea>
                                     @if ($errors->has('hunting_description'))
                                         <span class="invalid-feedback">
@@ -168,7 +177,7 @@
         let maxDateStart = new Date();
         maxDateStart.setDate(maxDateStart.getDate() + 1);
         $('#start').daterangepicker({
-            autoUpdateInput: false,
+            "autoUpdateInput": false,
             "singleDatePicker": true,
             "timePicker": true,
             "timePicker24Hour": true,
@@ -227,7 +236,7 @@
         let maxDateEnd = new Date();
         maxDateEnd.setDate(maxDateEnd.getDate() + 2);
         $('#end').daterangepicker({
-            autoUpdateInput: false,
+            "autoUpdateInput": false,
             "singleDatePicker": true,
             "timePicker": true,
             "timePicker24Hour": true,

@@ -7,14 +7,7 @@
 @stop
 
 @section('content')
-    @if(session()->has('success'))
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4><i class="icon fa fa-check"></i> Zapisano!</h4>
-            Dane zostały zapisane poprawnie.
-        </div>
-    @endif
-
+    @include('partials.alerts')
     <form id="hunting_edit" role="form" action="{{ route('hunting.update', ['id' => $hunting->id]) }}" method="post">
     {!! csrf_field() !!}
     {{ method_field('patch') }}
@@ -23,25 +16,21 @@
             <div class="col-md-12">
                 <!-- general form elements -->
                 <div class="card card-primary">
-                    @php
-                        $user = $hunting->user;
-                        $huntingGrounds = $hunting->usedHuntingGrounds->pluck('code')->implode(', ');
-                        $huntedAnimals = $hunting->huntedAnimals
-                    @endphp
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunter_name">Myśliwy</label>
                                     <input type="text" class="form-control" id="hunter_name"
-                                           value="{{ $user->first_name }} {{ $user->last_name }}" disabled>
+                                           value="{{ $hunting->user->name }}" disabled>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunting_grounds">Rewir</label>
                                     <input type="text" class="form-control" id="hunting_grounds"
-                                           value="{{ $huntingGrounds }}" disabled>
+                                           value="{{ $hunting->usedHuntingGrounds->pluck('code')->implode(', ') }}"
+                                           disabled>
                                 </div>
                             </div>
                         </div>
@@ -50,14 +39,14 @@
                                 <div class="form-group">
                                     <label for="hunting_start">Start</label>
                                     <input type="text" class="form-control" id="hunting_start"
-                                           value="{{ $hunting->start }}" disabled>
+                                           value="{{ $hunting->start->format('Y-m-d H:i') }}" disabled>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="hunting_end">Koniec</label>
-                                    <input type="text" class="form-control" id="hunting_end" value="{{ $hunting->end }}"
-                                           disabled>
+                                    <input type="text" class="form-control" id="hunting_end"
+                                           value="{{ $hunting->end->format('Y-m-d H:i') }}" disabled>
                                 </div>
                             </div>
                         </div>
@@ -65,11 +54,10 @@
                         <div class="row justify-content-center">
                             <div class="col-sm-3">
                                 <div class="form-group">
-                                    <label for="hunting_shots">Ilość oddanych strzałów</label>
+                                    <label for="hunting_shots">Oddana liczba strzałów</label>
                                     <input type="number" min="0" max="100" class="form-control" id="hunting_shots"
                                            name="hunting_shots"
-                                           @if (old('hunting_shots', null) != null) value="{{ old('hunting_shots') }}"
-                                           @else value="{{ $hunting->shots }}" @endif required>
+                                           value="{{ old('hunting_shots') ?? $hunting->shots }}" required>
                                     @if ($errors->has('hunting_shots'))
                                         <span class="invalid-feedback">
                                             {{ $errors->first('hunting_shots') }}
@@ -100,7 +88,7 @@
                                         </tr>
                                         </thead>
                                         <tbody id="huntedAnimalTbody">
-                                        @foreach($huntedAnimals as $key => $value)
+                                        @foreach($hunting->huntedAnimals as $key => $value)
                                             <tr>
                                                 <input type="hidden" name="animal_id_database[]"
                                                        value="{{ $value->id }}">
@@ -109,10 +97,10 @@
                                                         class="form-control animal_category_id {{ $errors->has('animal_category_id_stored.'.$key) ? 'is-invalid' : '' }}"
                                                         name="animal_category_id_stored[]" required>
                                                         <option value="">Wybierz kategorię</option>
-                                                        @foreach ($animal_categories as $animal_category)
-                                                            <option value="{{ $animal_category->id }}"
-                                                                    @if (old('animal_category_id_stored.'.$key) == $animal_category->id) selected
-                                                                    @elseif(old('animal_category_id_stored.'.$key, null) == null && $value->animal_category_id == $animal_category->id) selected @endif>{{ $animal_category->name }}</option>
+                                                        @foreach ($animalCategories as $animalCategory)
+                                                            <option value="{{ $animalCategory->id }}"
+                                                                    @if (old('animal_category_id_stored.'.$key) == $animalCategory->id) selected
+                                                                    @elseif(old('animal_category_id_stored.'.$key, null) == null && $value->animal_category_id == $animalCategory->id) selected @endif>{{ $animalCategory->name }}</option>
                                                         @endforeach
                                                     </select>
                                                     @if ($errors->has('animal_category_id_stored.'.$key))
@@ -194,9 +182,9 @@
                                                             class="form-control animal_category_id {{ $errors->has('animal_category_id.'.$key) ? 'is-invalid' : '' }}"
                                                             name="animal_category_id[]" required>
                                                             <option value="">Wybierz kategorię</option>
-                                                            @foreach ($animal_categories as $animal_category)
-                                                                <option value="{{ $animal_category->id }}"
-                                                                        @if (old('animal_category_id.'.$key) == $animal_category->id) selected @endif>{{ $animal_category->name }}</option>
+                                                            @foreach ($animalCategories as $animalCategory)
+                                                                <option value="{{ $animalCategory->id }}"
+                                                                        @if (old('animal_category_id.'.$key) == $animalCategory->id) selected @endif>{{ $animalCategory->name }}</option>
                                                             @endforeach
                                                         </select>
                                                         @if ($errors->has('animal_category_id.'.$key))
@@ -279,15 +267,14 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="hunting_description">Opis</label>
-                                    <textarea rows="3"
+                                    <textarea rows="3" maxlength="500"
                                               class="form-control {{ $errors->has('hunting_description') ? 'is-invalid' : '' }}"
-                                              name="hunting_description"
-                                              id="hunting_description" placeholder="Opis"
-                                              maxlength="500">@if (old('hunting_description', null) != null){{ old('hunting_description') }} @else{{ $hunting->description }}@endif</textarea>
+                                              name="hunting_description" id="hunting_description"
+                                              placeholder="Opis">{{ old('hunting_description') ?? $hunting->description }}</textarea>
                                     @if ($errors->has('hunting_description'))
                                         <span class="invalid-feedback">
-                                        {{ $errors->first('hunting_description') }}
-                                    </span>
+                                            {{ $errors->first('hunting_description') }}
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -305,7 +292,6 @@
                     </div>
 
                 </div>
-
 
             </div>
         </div>
@@ -331,8 +317,8 @@
                     <td>
                         <select class="form-control animal_category_id" name="animal_category_id[]" required id="city">
                         <option value="">Wybierz kategorię</option>
-                        @foreach ($animal_categories as $animal_category)
-                <option value="{{ $animal_category->id }}">{{ $animal_category->name }}</option>
+                        @foreach ($animalCategories as $animalCategory)
+                <option value="{{ $animalCategory->id }}">{{ $animalCategory->name }}</option>
                         @endforeach
                 </select>
             </td>
@@ -349,7 +335,7 @@
                 <option value="">Wybierz przeznaczenie</option>
 @foreach(\App\Enums\HuntedAnimalPurposes::asSelectArray() as $keyHuntedAnimalPurposes => $valueHuntedAnimalPurposes)
                 <option value="{{ $keyHuntedAnimalPurposes }}">{{ $valueHuntedAnimalPurposes }}</option>
-                    @endforeach
+                        @endforeach
                 </select>
             </td>
             <td>
