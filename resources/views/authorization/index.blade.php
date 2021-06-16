@@ -6,6 +6,8 @@
     <h1>Zarządzanie upoważnieniami dla obwodu "{{ Auth::user()->selectedDistrict->name }}"</h1>
 @stop
 
+@section('plugins.Datatables', true)
+
 @section('js')
     <script>
         $('#authorization').DataTable({

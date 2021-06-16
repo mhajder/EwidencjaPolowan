@@ -6,6 +6,9 @@
     <h1>Tworzenie polowania dla obwodu "{{ Auth::user()->selectedDistrict->name }}"</h1>
 @stop
 
+@section('plugins.Select2', true)
+@section('plugins.DateRangePicker', true)
+
 @section('content')
     @include('partials.alerts')
     <form id="hunting_create" role="form" action="{{ route('hunting.store') }}" method="post">

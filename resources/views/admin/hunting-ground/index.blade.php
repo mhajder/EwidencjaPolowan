@@ -6,6 +6,8 @@
     <h1>Zarządzanie rewirami dla obwodu "{{ $district->name }}"</h1>
 @stop
 
+@section('plugins.Datatables', true)
+
 @section('js')
     <script>
         $('#hunting_grounds').DataTable({

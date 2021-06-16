@@ -6,6 +6,8 @@
     <h1>Zarządzanie użytkownikami</h1>
 @stop
 
+@section('plugins.Datatables', true)
+
 @section('js')
     <script>
         $('#users').DataTable({

@@ -6,6 +6,8 @@
     <h1>Tworzenie upoważnienia dla obwodu "{{ Auth::user()->selectedDistrict->name }}"</h1>
 @stop
 
+@section('plugins.DateRangePicker', true)
+
 @section('content')
     @include('partials.alerts')
     <form id="authorization_create" role="form" action="{{ route('authorization.store') }}" method="post">
