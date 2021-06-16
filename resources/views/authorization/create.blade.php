@@ -51,17 +51,17 @@
                         <div class="row justify-content-center">
                             <div class="form-group col-md-6">
                                 @php
-                                    if (old('authorization_valid_from')) {
+                                    if (old('authorization_valid_from') || old('authorization_valid_until')) {
                                         if (Helper::checkIfDateIsValid(old('authorization_valid_from'))) {
                                             $authorization_valid_from_value = Carbon::parse(old('authorization_valid_from'))->format(Helper::AUTHORIZATION_DATE_RANGE_PICKER_FORMAT);
                                         } else {
-                                            $authorization_valid_from_value  = '';
+                                            $authorization_valid_from_value = old('authorization_valid_from');
                                         }
 
                                         if (Helper::checkIfDateIsValid(old('authorization_valid_until'))) {
                                             $authorization_valid_until = Carbon::parse(old('authorization_valid_until'))->format(Helper::AUTHORIZATION_DATE_RANGE_PICKER_FORMAT);
                                         } else {
-                                            $authorization_valid_until  = '';
+                                            $authorization_valid_until = old('authorization_valid_until');
                                         }
                                         $authorization_valid = $authorization_valid_from_value . ' - ' . $authorization_valid_until;
                                     }
@@ -69,7 +69,7 @@
                                 <label for="authorization_valid">Od/do*</label>
                                 <input
                                     class="form-control {{ $errors->has('authorization_valid_from') || $errors->has('authorization_valid_until') ? 'is-invalid' : '' }}"
-                                    id="authorization_valid" value="{{ $authorization_valid ?? ''}}" required>
+                                    id="authorization_valid" value="{{ $authorization_valid ?? '' }}" required>
                                 <input type="hidden" class="form-control" name="authorization_valid_from"
                                        id="authorization_valid_from"
                                        value="{{ old('authorization_valid_from') ? ( Helper::checkIfDateIsValid(old('authorization_valid_from')) ? Carbon::parse(old('authorization_valid_from'))->toRfc1123String() : false) : ''}}"
