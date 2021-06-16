@@ -1,13 +1,13 @@
 @php
     $districts = \App\Models\District::whereNull('parent_id')->get();
-    $userSelectedDistrict = $districts->find(Auth::user()->selected_district);
 @endphp
-@if(sizeof($districts) >= 1)
+@if(count($districts) >= 1)
 <li class="nav-item dropdown ">
     <a href="#" class="nav-link" data-toggle="dropdown" aria-expanded="true">
         <i class="fas fa-fw fa-flag"></i>
-        {{ $userSelectedDistrict->name }}
+        {{ Auth::user()->selectedDistrict->name }}
     </a>
+    @if(count($districts) > 1)
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
         <span class="dropdown-item dropdown-header">{{ __('adminlte::menu.change_district') }}</span>
         @foreach ($districts as $district)
@@ -19,5 +19,6 @@
                 </a>
             @endif
         @endforeach
+    @endif
 </li>
 @endif
