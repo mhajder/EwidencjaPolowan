@@ -47,6 +47,10 @@ class HelperTest extends TestCase
     {
         $this->assertTrue(Helper::CheckIfDateIsValid('2021-06-02 14:00:00'));
         $this->assertTrue(Helper::CheckIfDateIsValid('Tue Jun 01 2021 00:00:00 GMT+0200'));
+        $this->assertTrue(Helper::CheckIfDateIsValid(-1));
+        $this->assertFalse(Helper::CheckIfDateIsValid(0));
+        $this->assertFalse(Helper::CheckIfDateIsValid(1));
+        $this->assertFalse(Helper::CheckIfDateIsValid(null));
         $this->assertFalse(Helper::CheckIfDateIsValid('string not date'));
     }
 }

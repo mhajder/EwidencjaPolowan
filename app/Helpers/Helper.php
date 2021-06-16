@@ -57,10 +57,10 @@ class Helper
     /**
      * Check if date is valid.
      *
-     * @param string $date
+     * @param mixed $date
      * @return bool
      */
-    public static function checkIfDateIsValid(string $date): bool
+    public static function checkIfDateIsValid($date): bool
     {
         return empty(strtotime($date)) ? false : true;
     }
