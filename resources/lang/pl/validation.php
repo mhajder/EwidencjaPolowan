@@ -154,6 +154,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'hunting_start' => 'data rozpoczęcia',
+        'hunting_end' => 'data zakończenia',
+    ],
 
 ];
