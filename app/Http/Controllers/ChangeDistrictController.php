@@ -38,6 +38,6 @@ class ChangeDistrictController extends Controller
             'selected_district' => $district->id,
         ])->save();
 
-        return redirect()->back()->withInput();
+        return redirect()->back();
     }
 }
