@@ -44,6 +44,16 @@ class District extends Model
     ];
 
     /**
+     * Get an available hunting grounds from a given district.
+     *
+     * @return HasMany
+     */
+    public function availableHuntingGrounds(): HasMany
+    {
+        return $this->huntingGrounds()->where('disabled', '=', 0);
+    }
+
+    /**
      * Get a hunting grounds from a given district.
      *
      * @return HasMany
